@@ -2,6 +2,8 @@ package me.maiz.shield.web;
 
 import me.maiz.shield.common.Result;
 import me.maiz.shield.common.WebUtils;
+import me.maiz.shield.exceptions.AuthcException;
+import me.maiz.shield.exceptions.AuthzException;
 import me.maiz.shield.exceptions.ShieldException;
 import me.maiz.shield.service.ShieldService;
 
@@ -39,13 +41,16 @@ public class ShieldFilter implements Filter {
 
         try {
             shieldService.checkValid(token, requestURI);
-        }catch (ShieldException e){
+        }catch (AuthcException e){
+            //TODO logging exception
+            WebUtils.printResult(response,new Result(false,"0100","未登录，请先登录"));
+        }catch (AuthzException e){
             //TODO logging exception
             authStrategy.authzFail(e.getClass().getName(),e.getMessage());
 
         }catch (Exception e){
             //TODO logging exception
-            WebUtils.printResult(response,new Result(false,"0000","授权检查失败，请重试"));
+            WebUtils.printResult(response,new Result(false,"0200","授权检查失败，请重试"));
         }
 
 
